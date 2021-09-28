@@ -118,13 +118,17 @@ express()
     .all('/', async (req, res) => {
         const { code } = req.query
 
-        if (!code) return
+        if (!code)
+            return res.status(400).send({
+                code: 400,
+                message: 'bad request, you must pass OAuth code',
+            })
 
         console.log(`code: ${code}`)
 
         const { code: stateCode, response } = await oauth(code)
 
-        res.status(stateCode).send({ ...response, code: stateCode })
+        res.status(stateCode).send({ code: stateCode, ...response })
     })
     .all('*', (req, res) => res.status(404).send('404 NOT FOUND :('))
     .listen(process.env.PORT)
